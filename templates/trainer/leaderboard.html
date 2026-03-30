@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Рейтинг{% endblock %}
+
+{% block content %}
+<section class="hero card">
+    <div class="section-row">
+        <div>
+            <h1>Глобальный рейтинг</h1>
+            <p class="muted">Сравнивайте общий XP и недельную активность с другими пользователями.</p>
+        </div>
+        <div class="button-group no-margin">
+            <a class="button {% if period == 'all_time' %}{% else %}secondary{% endif %}" href="{% url 'leaderboard' %}?period=all_time">Все время</a>
+            <a class="button {% if period == 'weekly' %}{% else %}secondary{% endif %}" href="{% url 'leaderboard' %}?period=weekly">Неделя</a>
+        </div>
+    </div>
+</section>
+
+<section class="card">
+    {% if rows %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Пользователь</th>
+                        <th>Уровень</th>
+                        <th>XP</th>
+                        <th>Стрик</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>{{ row.rank }}</td>
+                            <td><a class="inline-link" href="{% url 'public-profile' row.user_id %}">{{ row.username }}</a></td>
+                            <td>{{ row.level }}</td>
+                            <td>{{ row.xp }}</td>
+                            <td>{{ row.streak_count }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="muted">Рейтинг пока пуст. Первые XP появятся после тренировок.</p>
+    {% endif %}
+</section>
+{% endblock %}

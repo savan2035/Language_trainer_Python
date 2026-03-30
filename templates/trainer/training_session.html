@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}{{ mode_label }}{% endblock %}
+
+{% block content %}
+<section class="card training-card">
+    <div class="progress-row">
+        <div>
+            <p class="muted">{{ mode_label }}</p>
+            <h1>{{ session_title }}</h1>
+            {% if mode == "review" %}
+                <p class="source-badge">Источник: {{ source_deck.icon }} {{ source_deck.title }} · {{ source_deck.get_language_display }}</p>
+            {% endif %}
+        </div>
+        <div class="progress-summary">
+            <div class="progress-pill">{{ current_number }} / {{ total_questions }}</div>
+            <div class="progress-xp">XP за сессию: {{ xp_gained }}</div>
+        </div>
+    </div>
+
+    <div class="question-box">
+        <p class="muted">Выберите перевод для слова</p>
+        <h2 class="question-word">{{ word.text }}</h2>
+        {% if word.example_sentence %}
+            <p class="muted example-line">Пример: {{ word.example_sentence }}</p>
+        {% endif %}
+    </div>
+
+    <form method="post" class="options-grid">
+        {% csrf_token %}
+        {% for option in options %}
+            <button type="submit" name="selected_option" value="{{ option.id }}" class="option-button">
+                {{ option.text }}
+            </button>
+        {% endfor %}
+    </form>
+
+    <p class="muted">Верных ответов в сессии: {{ correct_answers }}</p>
+</section>
+{% endblock %}

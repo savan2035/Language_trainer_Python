@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Языковой тренажер{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-row">
+            <div>
+                <a class="brand" href="{% url 'home' %}">Языковой тренажер</a>
+                <p class="brand-subtitle">SRS, квизы, карточки, повторение и рейтинг</p>
+            </div>
+            <nav class="nav">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}">Dashboard</a>
+                    <a href="{% url 'deck-list' %}">Наборы</a>
+                    <a href="{% url 'review-start' %}">Повторение</a>
+                    <a href="{% url 'leaderboard' %}">Рейтинг</a>
+                    <a href="{% url 'deck-create' %}">Создать набор</a>
+                    <a href="{% url 'deck-import' %}">Импорт CSV</a>
+                    <a href="{% url 'profile' %}">Профиль</a>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="link-button">Выйти</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}">Вход</a>
+                    <a href="{% url 'register' %}">Регистрация</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container page">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

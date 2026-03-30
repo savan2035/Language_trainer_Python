@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<section class="auth-card card narrow">
+    <h1>Регистрация</h1>
+    <p class="muted">Создайте аккаунт, чтобы импортировать свои слова и отслеживать прогресс по языкам.</p>
+    <form method="post" class="stack">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+            <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+                <div class="field-help">{{ field.help_text|safe }}</div>
+            {% endif %}
+            {% if field.errors %}
+                <div class="field-error">{{ field.errors|join:", " }}</div>
+            {% endif %}
+        {% endfor %}
+        <button type="submit" class="button">Создать аккаунт</button>
+    </form>
+</section>
+{% endblock %}

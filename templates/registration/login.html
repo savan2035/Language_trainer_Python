@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+<section class="auth-card card narrow">
+    <h1>Вход</h1>
+    <p class="muted">Войдите, чтобы продолжить обучение и видеть личную аналитику.</p>
+    <form method="post" class="stack">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+            <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+                <div class="field-error">{{ field.errors|join:", " }}</div>
+            {% endif %}
+        {% endfor %}
+        <button type="submit" class="button">Войти</button>
+    </form>
+    <p class="muted">Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p>
+</section>
+{% endblock %}

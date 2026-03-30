@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="hero card">
+    <div class="section-row">
+        <div>
+            <h1>Личный кабинет</h1>
+            <p class="muted">Основной язык: <strong>{{ profile.get_target_language_display|default:"не выбран" }}</strong></p>
+            <p>Здесь собраны SRS-повторение, общий прогресс, свежие ошибки и ваш темп обучения.</p>
+        </div>
+        <div class="hero-actions">
+            <div class="stats-highlight">
+                <span class="stats-label">Выучено слов</span>
+                <strong class="stats-value">{{ learned_total }}</strong>
+            </div>
+            <div class="streak-card">
+                <span class="streak-flame">🔥</span>
+                <div>
+                    <div class="stats-label">Ударный режим</div>
+                    <strong>{{ profile.streak_count }} дн.</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="stats-grid dashboard-top-grid">
+    <article class="card stat-card">
+        <p class="muted">Опыт</p>
+        <h2>{{ profile.total_xp }} XP</h2>
+        <p>Текущий уровень: <strong>{{ level }}</strong></p>
+    </article>
+    <article class="card stat-card review-cta {% if due_review_count %}review-cta-active{% endif %}">
+        <p class="muted">Интервальные повторения</p>
+        <h2>{{ due_review_count }}</h2>
+        {% if due_review_count %}
+            <p>Пора повторить {{ due_review_count }} слов.</p>
+            <a class="button" href="{% url 'review-start' %}">Начать повторение</a>
+        {% else %}
+            <p>Сегодня очередь повторения пустая. Можно пройти обычную тренировку.</p>
+            <a class="button secondary" href="{% url 'deck-list' %}">К наборам</a>
+        {% endif %}
+    </article>
+    <article class="card stat-card">
+        <p class="muted">Достижения</p>
+        <h2>{{ earned_achievements|length }}</h2>
+        <p>Последние награды уже ждут ниже в профиле.</p>
+    </article>
+</section>
+
+<section class="stats-grid">
+    {% for item in language_progress %}
+        <article class="card stat-card">
+            <p class="muted">{{ item.label }}</p>
+            <h2>{{ item.percentage }}%</h2>
+            <p>{{ item.learned_words }} из {{ item.total_words }} слов отмечены как выученные.</p>
+        </article>
+    {% endfor %}
+</section>
+
+<section class="content-grid">
+    <article class="card">
+        <div class="section-row">
+            <h2>Последние ошибки</h2>
+            <a class="inline-link" href="{% url 'deck-list' %}">К наборам</a>
+        </div>
+        {% if recent_mistakes %}
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Слово</th>
+                            <th>Правильный ответ</th>
+                            <th>Режим</th>
+                            <th>Набор</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in recent_mistakes %}
+                            <tr>
+                                <td>{{ log.word.text }}</td>
+                                <td>{{ log.word.translation }}</td>
+                                <td>{{ log.get_mode_display }}</td>
+                                <td>{{ log.deck.title }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="muted">Пока нет последних ошибок. Отличный момент начать новую тренировку.</p>
+        {% endif %}
+    </article>
+
+    <article class="card">
+        <div class="section-row">
+            <h2>Последние достижения</h2>
+            <a class="inline-link" href="{% url 'profile' %}">Настройки профиля</a>
+        </div>
+        {% if earned_achievements %}
+            <div class="mini-list">
+                {% for user_achievement in earned_achievements %}
+                    <div class="mini-list-item">
+                        <div>
+                            <strong>{{ user_achievement.achievement.title }}</strong>
+                            <p class="muted">{{ user_achievement.achievement.description }}</p>
+                        </div>
+                        <span class="pill pill-public">Новая награда</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="muted">Награды откроются после первых повторений, XP и стрика.</p>
+        {% endif %}
+    </article>
+</section>
+
+<section class="content-grid">
+    <article class="card">
+        <div class="section-row">
+            <h2>Мои наборы</h2>
+            <a class="inline-link" href="{% url 'deck-create' %}">Создать новый</a>
+        </div>
+        {% if owned_decks %}
+            <div class="mini-list">
+                {% for deck in owned_decks %}
+                    <div class="mini-list-item">
+                        <div>
+                            <strong>{{ deck.icon }} {{ deck.title }}</strong>
+                            <p class="muted">{{ deck.get_language_display }} · {{ deck.word_count }} слов</p>
+                        </div>
+                        <a class="button secondary compact" href="{% url 'deck-edit' deck.id %}">Редактировать</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="muted">Личных наборов пока нет. Можно создать новый или импортировать CSV.</p>
+            <div class="button-group">
+                <a class="button" href="{% url 'deck-create' %}">Создать набор</a>
+                <a class="button secondary" href="{% url 'deck-import' %}">Импортировать CSV</a>
+            </div>
+        {% endif %}
+    </article>
+
+    <article class="card">
+        <div class="section-row">
+            <h2>Топ недели</h2>
+            <a class="inline-link" href="{% url 'leaderboard' %}?period=weekly">Открыть рейтинг</a>
+        </div>
+        {% if leaderboard_preview %}
+            <div class="mini-list">
+                {% for row in leaderboard_preview %}
+                    <a class="mini-list-item leaderboard-row-link" href="{% url 'public-profile' row.user_id %}">
+                        <div>
+                            <strong>#{{ row.rank }} {{ row.username }}</strong>
+                            <p class="muted">Уровень {{ row.level }} · Стрик {{ row.streak_count }}</p>
+                        </div>
+                        <strong>{{ row.xp }} XP</strong>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="muted">Рейтинг заполнится, когда пользователи начнут получать XP.</p>
+        {% endif %}
+    </article>
+</section>
+{% endblock %}

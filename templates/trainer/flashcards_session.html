@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Карточки{% endblock %}
+
+{% block content %}
+<section class="card training-card">
+    <div class="progress-row">
+        <div>
+            <p class="muted">{{ mode_label }}</p>
+            <h1>{{ session_title }}</h1>
+        </div>
+        <div class="progress-summary">
+            <div class="progress-pill">{{ current_number }} / {{ total_questions }}</div>
+            <div class="progress-xp">Знакомых слов: {{ known_answers }}</div>
+        </div>
+    </div>
+
+    <button type="button" class="flashcard-shell" data-flashcard>
+        <span class="flashcard-side flashcard-front">
+            <span class="muted">Нажмите, чтобы перевернуть</span>
+            <strong class="flashcard-word">{{ word.text }}</strong>
+        </span>
+        <span class="flashcard-side flashcard-back">
+            <span class="muted">Перевод</span>
+            <strong class="flashcard-word">{{ word.translation }}</strong>
+            {% if word.example_sentence %}
+                <span class="flashcard-example">{{ word.example_sentence }}</span>
+            {% endif %}
+        </span>
+    </button>
+
+    <form method="post" class="button-group centered-group">
+        {% csrf_token %}
+        <button type="submit" name="flashcard_action" value="known" class="button">Я знал это слово</button>
+        <button type="submit" name="flashcard_action" value="unknown" class="button secondary">Не знал</button>
+    </form>
+
+    <p class="muted centered-text">Этот режим не дает XP и не сдвигает SRS, но помогает познакомиться со словами.</p>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const card = document.querySelector("[data-flashcard]");
+    if (!card) {
+        return;
+    }
+    card.addEventListener("click", function () {
+        card.classList.toggle("is-flipped");
+    });
+});
+</script>
+{% endblock %}

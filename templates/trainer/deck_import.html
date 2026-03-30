@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Импорт CSV{% endblock %}
+
+{% block content %}
+<section class="card narrow">
+    <h1>Импорт CSV</h1>
+    <p class="muted">Формат строк: <code>слово,перевод,пример</code>. Файл должен быть сохранен в UTF-8.</p>
+    <form method="post" enctype="multipart/form-data" class="stack">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+            <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+                <div class="field-help">{{ field.help_text }}</div>
+            {% endif %}
+            {% if field.errors %}
+                <div class="field-error">{{ field.errors|join:", " }}</div>
+            {% endif %}
+        {% endfor %}
+        <button type="submit" class="button">Импортировать</button>
+    </form>
+</section>
+{% endblock %}

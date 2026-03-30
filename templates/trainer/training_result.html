@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Результат{% endblock %}
+
+{% block content %}
+<section class="card narrow">
+    <h1>Сессия завершена</h1>
+    <p>Режим: <strong>{{ result.mode_label }}</strong></p>
+    <p>Источник: <strong>{{ result.deck_icon }} {{ result.deck_title }}</strong></p>
+
+    {% if result.mode == "flashcards" %}
+        <p class="result-text">Вы просмотрели {{ result.total_questions }} карточек. Знакомых слов: {{ result.known_answers }}/{{ result.total_questions }}</p>
+    {% else %}
+        <p class="result-text">Верных ответов: {{ result.correct_answers }}/{{ result.total_questions }}</p>
+        <p class="result-text">Получено XP: {{ result.xp_gained }}</p>
+    {% endif %}
+
+    <div class="button-group">
+        {% if result.is_review %}
+            <a class="button" href="{% url 'review-start' %}">Пройти еще раз</a>
+        {% else %}
+            <a class="button" href="{% url 'study-start' deck.id result.mode %}">Пройти еще раз</a>
+        {% endif %}
+        <a class="button secondary" href="{% url 'dashboard' %}">К dashboard</a>
+    </div>
+</section>
+{% endblock %}

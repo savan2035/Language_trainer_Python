@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="card">
+    <div class="section-row">
+        <div>
+            <h1>{{ title }}</h1>
+            <p class="muted">Добавляйте свои слова вручную. Для массовой загрузки есть отдельный CSV-импорт.</p>
+        </div>
+        {% if deck %}
+            <a class="button secondary" href="{% url 'deck-list' %}">К наборам</a>
+        {% endif %}
+    </div>
+
+    <form method="post" class="stack">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="form-grid">
+            {% for field in form %}
+                <div>
+                    <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="field-error">{{ field.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="card inner-card">
+            <div class="section-row">
+                <h2>Слова набора</h2>
+                <p class="muted">Можно удалять строки через чекбокс «Удалить».</p>
+            </div>
+            {{ formset.management_form }}
+            {{ formset.non_form_errors }}
+            <div class="word-formset">
+                {% for word_form in formset %}
+                    <div class="word-form-row">
+                        {% for hidden in word_form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+                        <div>
+                            <label class="field-label" for="{{ word_form.text.id_for_label }}">Слово</label>
+                            {{ word_form.text }}
+                            {% if word_form.text.errors %}
+                                <div class="field-error">{{ word_form.text.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="field-label" for="{{ word_form.translation.id_for_label }}">Перевод</label>
+                            {{ word_form.translation }}
+                            {% if word_form.translation.errors %}
+                                <div class="field-error">{{ word_form.translation.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="field-label" for="{{ word_form.example_sentence.id_for_label }}">Пример</label>
+                            {{ word_form.example_sentence }}
+                            {% if word_form.example_sentence.errors %}
+                                <div class="field-error">{{ word_form.example_sentence.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="delete-cell">
+                            {% if word_form.DELETE %}
+                                <label class="field-label" for="{{ word_form.DELETE.id_for_label }}">Удалить</label>
+                                {{ word_form.DELETE }}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="button">{{ submit_label }}</button>
+            <a class="button secondary" href="{% url 'deck-list' %}">Отмена</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

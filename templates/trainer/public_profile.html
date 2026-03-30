@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль {{ target_user.username }}{% endblock %}
+
+{% block content %}
+<section class="hero card">
+    <div class="section-row">
+        <div>
+            <h1>{{ target_user.username }}</h1>
+            <p class="muted">Публичный профиль ученика</p>
+        </div>
+        <div class="hero-actions">
+            <div class="stats-highlight">
+                <span class="stats-label">Уровень</span>
+                <strong class="stats-value">{{ level }}</strong>
+            </div>
+            <div class="stats-highlight">
+                <span class="stats-label">XP</span>
+                <strong class="stats-value">{{ profile.total_xp }}</strong>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="stats-grid">
+    <article class="card stat-card">
+        <p class="muted">Стрик</p>
+        <h2>{{ profile.streak_count }}</h2>
+        <p>Последняя активность: {{ profile.last_activity_date|default:"неизвестно" }}</p>
+    </article>
+    <article class="card stat-card">
+        <p class="muted">Выучено слов</p>
+        <h2>{{ learned_words_count }}</h2>
+        <p>Подсчет ведется по порогу выученности приложения.</p>
+    </article>
+</section>
+
+<section class="content-grid">
+    <article class="card">
+        <h2>Языки</h2>
+        {% if learned_languages %}
+            <div class="mini-list">
+                {% for item in learned_languages %}
+                    <div class="mini-list-item">
+                        <div>
+                            <strong>{{ item.label }}</strong>
+                            <p class="muted">Выучено слов: {{ item.count }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="muted">Пока нет отмеченных выученных слов.</p>
+        {% endif %}
+    </article>
+
+    <article class="card">
+        <h2>Достижения</h2>
+        {% if earned_achievements %}
+            <div class="mini-list">
+                {% for item in earned_achievements %}
+                    <div class="mini-list-item">
+                        <div>
+                            <strong>{{ item.achievement.title }}</strong>
+                            <p class="muted">{{ item.achievement.description }}</p>
+                        </div>
+                        <span class="muted">{{ item.unlocked_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="muted">Достижения еще не открыты.</p>
+        {% endif %}
+    </article>
+</section>
+{% endblock %}

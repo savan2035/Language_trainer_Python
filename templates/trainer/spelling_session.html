@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Spelling{% endblock %}
+
+{% block content %}
+<section class="card training-card">
+    <div class="progress-row">
+        <div>
+            <p class="muted">{{ mode_label }}</p>
+            <h1>{{ session_title }}</h1>
+        </div>
+        <div class="progress-summary">
+            <div class="progress-pill">{{ current_number }} / {{ total_questions }}</div>
+            <div class="progress-xp">XP за сессию: {{ xp_gained }}</div>
+        </div>
+    </div>
+
+    <div class="question-box">
+        <p class="muted">Введите оригинал по переводу</p>
+        <h2 class="question-word">{{ word.translation }}</h2>
+        {% if word.example_sentence %}
+            <p class="muted example-line">Пример: {{ word.example_sentence }}</p>
+        {% endif %}
+    </div>
+
+    <form method="post" class="stack">
+        {% csrf_token %}
+        {% for field in form %}
+            <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+                <div class="field-error">{{ field.errors|join:", " }}</div>
+            {% endif %}
+        {% endfor %}
+        <button type="submit" class="button">Проверить</button>
+    </form>
+
+    <p class="muted">Верных ответов в сессии: {{ correct_answers }}</p>
+</section>
+{% endblock %}

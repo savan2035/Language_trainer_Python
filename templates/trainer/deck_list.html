@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Наборы{% endblock %}
+
+{% block content %}
+<section class="hero card">
+    <div class="section-row">
+        <div>
+            <h1>Наборы слов</h1>
+            <p class="muted">Язык профиля: <strong>{{ profile.get_target_language_display }}</strong></p>
+            <p>Выберите публичный или личный набор и запустите карточки, квиз, spelling или отдельное глобальное повторение.</p>
+        </div>
+        <div class="button-group no-margin">
+            <a class="button" href="{% url 'deck-create' %}">Новый набор</a>
+            <a class="button secondary" href="{% url 'deck-import' %}">Импорт CSV</a>
+        </div>
+    </div>
+</section>
+
+<section class="card review-strip {% if due_review_count %}review-strip-active{% endif %}">
+    <div class="section-row">
+        <div>
+            <h2>Режим повторения</h2>
+            {% if due_review_count %}
+                <p>Пора повторить {{ due_review_count }} слов по SRS.</p>
+            {% else %}
+                <p>Сегодня нет слов с датой повторения на сейчас.</p>
+            {% endif %}
+        </div>
+        {% if due_review_count %}
+            <a class="button" href="{% url 'review-start' %}">Начать повторение</a>
+        {% else %}
+            <a class="button secondary" href="{% url 'dashboard' %}">К dashboard</a>
+        {% endif %}
+    </div>
+</section>
+
+<section class="deck-grid">
+    {% for item in deck_cards %}
+        <article class="card deck-card">
+            <div class="deck-meta-top">
+                <div class="deck-icon">{{ item.deck.icon }}</div>
+                <span class="pill {% if item.deck.is_public %}pill-public{% else %}pill-private{% endif %}">
+                    {% if item.deck.is_public %}Public{% else %}Private{% endif %}
+                </span>
+            </div>
+            <h2>{{ item.deck.title }}</h2>
+            <p class="muted">
+                {% if item.deck.is_public %}
+                    Предустановленный набор
+                {% else %}
+                    Ваш личный набор
+                {% endif %}
+            </p>
+            <p>Слов: <strong>{{ item.word_count }}</strong></p>
+            <p>Выучено: <strong>{{ item.learned_count }}</strong></p>
+
+            <div class="mode-grid">
+                <a class="button" href="{% url 'study-start' item.deck.id 'flashcards' %}">Карточки</a>
+                <a class="button secondary" href="{% url 'study-start' item.deck.id 'multiple_choice' %}">Multiple Choice</a>
+                <a class="button secondary" href="{% url 'study-start' item.deck.id 'spelling' %}">Spelling</a>
+            </div>
+
+            {% if item.is_owner %}
+                <a class="inline-link" href="{% url 'deck-edit' item.deck.id %}">Редактировать набор</a>
+            {% endif %}
+        </article>
+    {% empty %}
+        <article class="card">
+            <h2>Наборы пока не найдены</h2>
+            <p>Создайте свой набор или импортируйте CSV в личном кабинете.</p>
+        </article>
+    {% endfor %}
+</section>
+{% endblock %}

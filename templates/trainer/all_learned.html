@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Набор изучен{% endblock %}
+
+{% block content %}
+<section class="card narrow">
+    <h1>{{ deck.icon }} {{ deck.title }}</h1>
+    <p>Все слова в этом наборе уже помечены как выученные для режима <strong>{{ mode_label }}</strong>.</p>
+    <div class="button-group">
+        <form method="post" action="{% url 'study-start' deck.id mode %}">
+            {% csrf_token %}
+            <input type="hidden" name="force_repeat" value="1">
+            <button type="submit" class="button">Пройти заново</button>
+        </form>
+        <form method="post" action="{% url 'study-start' deck.id mode %}">
+            {% csrf_token %}
+            <input type="hidden" name="reset_progress" value="1">
+            <button type="submit" class="button secondary">Сбросить прогресс</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

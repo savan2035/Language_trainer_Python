@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль{% endblock %}
+
+{% block content %}
+<section class="card narrow">
+    <h1>Профиль</h1>
+    <p class="muted">Выберите основной язык и настройте webhook-напоминания для ежедневных повторений.</p>
+
+    <div class="stats-grid profile-summary-grid">
+        <article class="card inner-card stat-card">
+            <p class="muted">Уровень</p>
+            <h2>{{ level }}</h2>
+            <p>{{ profile.total_xp }} XP накоплено за все время.</p>
+        </article>
+        <article class="card inner-card stat-card">
+            <p class="muted">Стрик</p>
+            <h2>{{ profile.streak_count }}</h2>
+            <p>Последняя активность: {{ profile.last_activity_date|default:"еще не было" }}</p>
+        </article>
+    </div>
+
+    <form method="post" class="stack">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+            <div>
+                <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <div class="field-help">{{ field.help_text }}</div>
+                {% endif %}
+                {% if field.errors %}
+                    <div class="field-error">{{ field.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="button">Сохранить</button>
+    </form>
+
+    <div class="info-box">
+        <p><strong>Текущий язык:</strong> {{ profile.get_target_language_display|default:"не выбран" }}</p>
+        <p><strong>Напоминания:</strong> {% if profile.reminders_enabled %}включены{% else %}выключены{% endif %}</p>
+        <p><strong>Канал:</strong> {{ profile.get_reminder_channel_display }}</p>
+    </div>
+
+    <div class="button-group">
+        <a class="button secondary" href="{% url 'dashboard' %}">К dashboard</a>
+        <a class="button secondary" href="{% url 'leaderboard' %}">Открыть рейтинг</a>
+    </div>
+</section>
+{% endblock %}
